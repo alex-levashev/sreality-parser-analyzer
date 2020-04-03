@@ -1,0 +1,34 @@
+version: "3.2"
+services:
+  www:
+    build:
+      context: ${PWD}
+      dockerfile: Dockerfile.www
+    image: alexlevashev/sreality-parser-www:1.0
+    container_name: www
+    ports:
+      - "8001:80"
+    volumes:
+      - ${PWD}/docker/www:/var/www/html/
+    links:
+      - py-mongo
+    networks:
+      - default
+  py-mongo:
+    container_name: mongodb
+    build:
+      context: ${PWD}
+      dockerfile: Dockerfile.mongodb
+    image: alexlevashev/sreality-parser-db-py:1.0
+    volumes:
+      - $PWD/docker/db:/data/db
+      - $PWD/docker/code:/data/code
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    networks:
+      - default
+volumes:
+  persistent:
