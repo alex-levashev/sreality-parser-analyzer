@@ -11,12 +11,10 @@ from datetime import datetime, timedelta
 request = [
 'category_type_cb=1',
 'category_main_cb=1',
-'category_sub_cb=2',
 'ownership=1',
-'czk_price_summary_order2=1000000-8000000',
-'estate_age=31',
-'locality_country_id=112',
-'locality_district_id=5004,5005,5006,5007,5008,5009,5010'
+'czk_price_summary_order2=1000000-10000000',
+'estate_age=0',
+'locality_district_id=5001,5002,5003,5004,5005,5006,5007,5008,5009,5010'
 ]
 
 per_page = 200
@@ -64,6 +62,7 @@ else:
         houses = FilterData(request, per_page, page_number)['_embedded']['estates']
         for item in houses:
             n += 1
+            tmp = ItemData(item['hash_id'])
             record = col.update({'_embedded.favourite._links.self.href': tmp['_embedded']['favourite']['_links']['self']['href']}, tmp, upsert=True)
         page_number += 1
 print('Script finished successfully ...')

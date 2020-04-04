@@ -1,9 +1,35 @@
 <?php
-function DateTimePick($mindate, $maxdate) {
+
+function DropDown($name, $default_option, $array) {
+  echo '<div class="form-group">';
+    echo '<div class="input-group" id="' . $name . '">';
+      echo '<select style="width: 200px !important;" type="text" class="form-control" name="' . $name . '" type="' . $name . '">';
+        if($_GET[$name] == '' OR $_GET[$name] == 'NA') {
+          echo '<option selected value="NA">' . $default_option . '</option>';
+        } else {
+          echo '<option value="NA">' . $default_option . '</option>';
+        }
+        foreach($array as $key => $value) {
+          if($_GET[$name] == $key) {
+            echo '<option selected value="' . $key . '">' . $value . '</option>';
+          } else {
+            echo '<option value="' . $key . '">' . $value . '</option>';
+          }
+        }
+      echo '</select>';
+    echo '</div>';
+  echo '</div>';
+}
+
+function DateTimeOptionsPick($mindate, $maxdate) {
   global $FilterStartDate, $FilterEndDate;
-  echo '<div class="center container col-sm-12">';
-    echo '<form>';
+  global $category_type_cb, $category_main_cb, $category_sub_cb, $something_more1, $something_more2, $something_more3, $building_type_search, $ownership, $floor_number, $building_condition, $czk_price_summary_order2, $usable_area, $furnished, $estate_age, $locality_country_id, $locality_region_id, $locality_district_id;
+
+  echo '<form>';
+    echo '<div class="center container col-sm-12">';
+
       echo '<div class="col-sm-3"></div>';
+
       echo '<div class="col-sm-3">';
         echo '<div class="form-group">';
           echo '<div class="input-group date" id="datetimepicker6">';
@@ -15,6 +41,7 @@ function DateTimePick($mindate, $maxdate) {
           echo '</div>';
         echo '</div>';
       echo '</div>';
+
       echo '<div class="col-sm-3">';
         echo '<div class="form-group">';
           echo '<div class="input-group date" id="datetimepicker7">';
@@ -26,12 +53,43 @@ function DateTimePick($mindate, $maxdate) {
           echo '</div>';
         echo '</div>';
       echo '</div>';
-      echo '<div class="col-sm-1">';
-        echo '<center><button type="submit" class="btn btn-secondary">Submit</button></center>';
+
+      echo '<div class="col-sm-3"></div>';
+    echo '</div>';
+
+    echo '<div class="center container col-sm-12">';
+
+      echo '<div class="col-sm-2">';
+        DropDown("category_sub_cb", "Flat Type", $category_sub_cb);
       echo '</div>';
-      echo '<div class="col-sm-2"></div>';
-    echo '</form>';
-  echo '</div>';
+
+      echo '<div class="col-sm-2">';
+        DropDown("building_type_search", "Building Type", $building_type_search);
+      echo '</div>';
+
+      echo '<div class="col-sm-2">';
+        DropDown("ownership", "Ownership", $ownership);
+      echo '</div>';
+
+      echo '<div class="col-sm-2">';
+        DropDown("building_condition", "Condition", $building_condition);
+      echo '</div>';
+
+      echo '<div class="col-sm-2">';
+        DropDown("furnished", "Furnished", $furnished);
+      echo '</div>';
+
+      echo '<div class="col-sm-2">';
+        DropDown("locality_district_id", "Location", $locality_district_id);
+      echo '</div>';
+
+    echo '</div>';
+
+    echo '<div class="center container col-sm-12">';
+      echo '<center><button type="submit" class="btn btn-secondary">Submit</button></center>';
+    echo '</div>';
+
+  echo '</form>';
 
   echo '<script type="text/javascript">';
   echo 'moment.updateLocale("en", {';
@@ -58,7 +116,6 @@ function DateTimePick($mindate, $maxdate) {
 function GraphFromArray($init_array, $start_date, $end_date) {
   $dates = ('"' . implode('", "', array_keys($init_array)) . '"');
   $values = implode(', ', array_values($init_array));
-  echo(strtotime($end_date)-strtotime($start_date));
   if($init_array == []) {
     echo '<pre>No Data!</pre>';
   } else {
