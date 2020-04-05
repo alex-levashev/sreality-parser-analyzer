@@ -1,16 +1,17 @@
 <?php
 
-function DropDown($name, $default_option, $array) {
+function DropDown($name, $default_option, $array, $params) {
   echo '<div class="form-group">';
     echo '<div class="input-group" id="' . $name . '">';
-      echo '<select style="width: 200px !important;" type="text" class="form-control" name="' . $name . '" type="' . $name . '">';
-        if($_GET[$name] == '' OR $_GET[$name] == 'NA') {
-          echo '<option selected value="NA">' . $default_option . '</option>';
-        } else {
-          echo '<option value="NA">' . $default_option . '</option>';
-        }
+      echo '<label for="' . $name . '">' . $default_option . ':</label>';
+      echo '<select multiple style="width: 200px !important;" type="text" id "' . $name . '" class="form-control" name="' . $name . '" type="' . $name . '">';
+        // if($_GET[$name] == '' OR $_GET[$name] == 'NA') {
+        //   echo '<option selected value="NA">' . $default_option . '</option>';
+        // } else {
+        //   echo '<option value="NA">' . $default_option . '</option>';
+        // }
         foreach($array as $key => $value) {
-          if($_GET[$name] == $key) {
+          if(in_array($key, $params[$name])) {
             echo '<option selected value="' . $key . '">' . $value . '</option>';
           } else {
             echo '<option value="' . $key . '">' . $value . '</option>';
@@ -21,7 +22,7 @@ function DropDown($name, $default_option, $array) {
   echo '</div>';
 }
 
-function DateTimeOptionsPick($mindate, $maxdate) {
+function DateTimeOptionsPick($mindate, $maxdate, $params) {
   global $FilterStartDate, $FilterEndDate;
   global $category_type_cb, $category_main_cb, $category_sub_cb, $something_more1, $something_more2, $something_more3, $building_type_search, $ownership, $floor_number, $building_condition, $czk_price_summary_order2, $usable_area, $furnished, $estate_age, $locality_country_id, $locality_region_id, $locality_district_id;
 
@@ -59,29 +60,29 @@ function DateTimeOptionsPick($mindate, $maxdate) {
 
     echo '<div class="center container col-sm-12">';
 
+      echo '<div class="col-sm-1"></div>';
+
       echo '<div class="col-sm-2">';
-        DropDown("category_sub_cb", "Flat Type", $category_sub_cb);
+        DropDown("category_sub_cb", "Flat Type", $category_sub_cb, $params);
       echo '</div>';
 
       echo '<div class="col-sm-2">';
-        DropDown("building_type_search", "Building Type", $building_type_search);
+        DropDown("building_type_search", "Building Type", $building_type_search, $params);
       echo '</div>';
 
       echo '<div class="col-sm-2">';
-        DropDown("ownership", "Ownership", $ownership);
+        DropDown("ownership", "Ownership", $ownership, $params);
       echo '</div>';
 
       echo '<div class="col-sm-2">';
-        DropDown("building_condition", "Condition", $building_condition);
+        DropDown("building_condition", "Condition", $building_condition, $params);
       echo '</div>';
 
       echo '<div class="col-sm-2">';
-        DropDown("furnished", "Furnished", $furnished);
+        DropDown("locality_district_id", "Location", $locality_district_id, $params);
       echo '</div>';
 
-      echo '<div class="col-sm-2">';
-        DropDown("locality_district_id", "Location", $locality_district_id);
-      echo '</div>';
+      echo '<div class="col-sm-1"></div>';
 
     echo '</div>';
 

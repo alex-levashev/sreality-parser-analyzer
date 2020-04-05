@@ -34,33 +34,51 @@
 
     $filter = [];
 
-    if($_GET['category_sub_cb'] != '' AND $_GET['category_sub_cb'] != 'NA') {
-      $filter["seo.category_sub_cb"] = (int)$_GET['category_sub_cb'];
+    if($_SERVER['QUERY_STRING'] != '') {
+      $query  = explode('&', $_SERVER['QUERY_STRING']);
+      $params = array();
+
+      foreach( $query as $param ) {
+          if (strpos($param, '=') === false) $param += '=';
+          list($name, $value) = explode('=', $param, 2);
+          $params[urldecode($name)][] = (int)urldecode($value);
+      }
     }
 
-    if($_GET['building_type_search'] != '' AND $_GET['building_type_search'] != 'NA') {
-      $filter["codeItems.building_type_search"] = (int)$_GET['building_type_search'];
+    if($params['category_sub_cb'] != '') {
+        $filter["seo.category_sub_cb"] = [ '$in' => $params['category_sub_cb'] ];
     }
 
-    if($_GET['ownership'] != '' AND $_GET['ownership'] != 'NA') {
-      $filter["codeItems.ownership"] = (int)$_GET['ownership'];
+    if($params['building_type_search'] != '') {
+      $filter["codeItems.building_type_search"] = [ '$in' => $params['building_type_search'] ];
     }
 
-    if($_GET['building_condition'] != '' AND $_GET['building_condition'] != 'NA') {
+    if($params['ownership'] != '') {
+      $filter["codeItems.ownership"] = [ '$in' => $params['ownership'] ];
+    }
+
+    if($params['building_condition'] != '') {
       $filter["items.name"] = 'Stav objektu';
-      $filter["items.value"] = $building_condition[$_GET['building_condition']];
+      foreach($params['building_condition'] as $item) {
+        $params['building_condition'][array_search($item, $params['building_condition'])] = $building_condition[$item];
+      }
+      $filter["items.value"] = [ '$in' => $params['building_condition'] ];
     }
 
-    if($_GET['furnished'] != '' AND $_GET['furnished'] != 'NA') {
-      $filter["items.name"] = 'Vybavení';
-      $filter["items.value"] = $furnished[$_GET['furnished']];
-    }
+    // if($params['furnished'] != '') {
+    //   $filter["items.name"] = 'Vybavení';
+    //   foreach($params['furnished'] as $item) {
+    //     $params['furnished'][array_search($item, $params['furnished'])] = $building_condition[$item];
+    //   }
+    //   $filter["items.value"] = [ '$in' => $params['furnished'] ];
+    // }
 
-    if($_GET['locality_district_id'] != '' AND $_GET['locality_district_id'] != 'NA') {
-      $filter["locality_district_id"] = (int)$_GET['locality_district_id'];
+    if($params['locality_district_id'] != '') {
+      $filter["locality_district_id"] = [ '$in' => $params['locality_district_id'] ];
     }
 
     $options = [];
+    // $filter = [ "seo.category_sub_cb" => [ '$in' => [3,2] ] ];
     // echo('<pre>');
     // var_dump($filter);
     // echo('</pre>');
@@ -92,7 +110,7 @@
     $now_date = date("d-m-Y H:i:s");
 
     echo('<center>TOTAL NUMBER OF RECORDS IS ') . $count . '</center><br>';
-    DateTimeOptionsPick(key($prices_by_date), end(array_keys($prices_by_date)));
+    DateTimeOptionsPick(key($prices_by_date), end(array_keys($prices_by_date)), $params);
     GraphFromArray($prices_by_date, $FilterStartDate, $FilterEndDate);
 
   echo '</div>'
