@@ -53,10 +53,6 @@
       $filter["codeItems.building_type_search"] = [ '$in' => $params['building_type_search'] ];
     }
 
-    if($params['ownership'] != '') {
-      $filter["codeItems.ownership"] = [ '$in' => $params['ownership'] ];
-    }
-
     if($params['building_condition'] != '') {
       $filter["items.name"] = 'Stav objektu';
       foreach($params['building_condition'] as $item) {
@@ -65,24 +61,11 @@
       $filter["items.value"] = [ '$in' => $params['building_condition'] ];
     }
 
-    // if($params['furnished'] != '') {
-    //   $filter["items.name"] = 'Vybavení';
-    //   foreach($params['furnished'] as $item) {
-    //     $params['furnished'][array_search($item, $params['furnished'])] = $building_condition[$item];
-    //   }
-    //   $filter["items.value"] = [ '$in' => $params['furnished'] ];
-    // }
-
     if($params['locality_district_id'] != '') {
       $filter["locality_district_id"] = [ '$in' => $params['locality_district_id'] ];
     }
 
     $options = [];
-    // $filter = [ "seo.category_sub_cb" => [ '$in' => [3,2] ] ];
-    // echo('<pre>');
-    // var_dump($filter);
-    // echo('</pre>');
-
 
     $query = new MongoDB\Driver\Query($filter, $options);
     $rows = $mng->executeQuery("real_estate.raw_requests", $query);
@@ -91,12 +74,12 @@
     foreach ($rows as $row) {
       $count += 1;
       $row = json_decode(json_encode($row), true);
-      foreach($row['items'] as $i) {
-        if($i['name'] == 'Aktualizace') {
-          $date = date('Y-m-d', strtotime($i['value']));
-        }
-        if($i['name'] == 'Užitná plocha') {
-          $prices_by_date[$date][] = round($row['price_czk']['value_raw']/$i['value'], 0);
+      $date = date('Y-m-d', strtotime($row['parsed']['date'])); 
+      if($row['items'] != '') {
+        foreach($row['items'] as $i) {
+          if($i['name'] == 'Užitná plocha') {
+            $prices_by_date[$date][] = round($row['price_czk']['value_raw']/$i['value'], 0);
+          }
         }
       }
     }

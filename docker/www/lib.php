@@ -5,11 +5,6 @@ function DropDown($name, $default_option, $array, $params) {
     echo '<div class="input-group" id="' . $name . '">';
       echo '<label for="' . $name . '">' . $default_option . ':</label>';
       echo '<select multiple style="width: 200px !important;" type="text" id "' . $name . '" class="form-control" name="' . $name . '" type="' . $name . '">';
-        // if($_GET[$name] == '' OR $_GET[$name] == 'NA') {
-        //   echo '<option selected value="NA">' . $default_option . '</option>';
-        // } else {
-        //   echo '<option value="NA">' . $default_option . '</option>';
-        // }
         foreach($array as $key => $value) {
           if(in_array($key, $params[$name])) {
             echo '<option selected value="' . $key . '">' . $value . '</option>';
@@ -60,7 +55,7 @@ function DateTimeOptionsPick($mindate, $maxdate, $params) {
 
     echo '<div class="center container col-sm-12">';
 
-      echo '<div class="col-sm-1"></div>';
+      echo '<div class="col-sm-2"></div>';
 
       echo '<div class="col-sm-2">';
         DropDown("category_sub_cb", "Flat Type", $category_sub_cb, $params);
@@ -71,10 +66,6 @@ function DateTimeOptionsPick($mindate, $maxdate, $params) {
       echo '</div>';
 
       echo '<div class="col-sm-2">';
-        DropDown("ownership", "Ownership", $ownership, $params);
-      echo '</div>';
-
-      echo '<div class="col-sm-2">';
         DropDown("building_condition", "Condition", $building_condition, $params);
       echo '</div>';
 
@@ -82,7 +73,7 @@ function DateTimeOptionsPick($mindate, $maxdate, $params) {
         DropDown("locality_district_id", "Location", $locality_district_id, $params);
       echo '</div>';
 
-      echo '<div class="col-sm-1"></div>';
+      echo '<div class="col-sm-2"></div>';
 
     echo '</div>';
 
