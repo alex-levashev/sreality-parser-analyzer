@@ -9,7 +9,7 @@ services:
     ports:
       - "8001:80"
     volumes:
-      - ${PWD}/docker/www:/var/www/html/
+      - /volume1/docker/Sreality/docker/www:/var/www/html/
     links:
       - py-mongo
     networks:
@@ -22,8 +22,8 @@ services:
     image: alexlevashev/sreality-parser-db-py:1.0
     command: --bind_ip_all
     volumes:
-      - $PWD/docker/db:/data/db
-      - $PWD/docker/code:/data/code
+      - /volume1/docker/Sreality/docker/db:/data/db
+      - /volume1/docker/Sreality/docker/code:/data/code
     ports:
       - "27017:27017"
     environment:
