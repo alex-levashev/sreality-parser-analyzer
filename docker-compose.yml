@@ -10,8 +10,6 @@ services:
       - "8001:80"
     volumes:
       - /volume1/docker/Sreality/docker/www:/var/www/html/
-    links:
-      - py-mongo
     networks:
       - default
   py-mongo:
