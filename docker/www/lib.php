@@ -1,5 +1,11 @@
 <?php
 
+function pp( $val) {
+  echo'</pre>';
+  var_dump($val);
+  echo'<pre>';
+}
+
 function DropDown($name, $default_option, $array, $params) {
   echo '<div class="form-group">';
     echo '<div class="input-group" id="' . $name . '">';

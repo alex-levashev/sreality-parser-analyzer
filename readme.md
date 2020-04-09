@@ -45,7 +45,7 @@ usable_area => 0:"Neomezeno", 10000000000:"Neomezeno"
 furnished => 1:"Ano", 2:"Ne", 3:"Castecne"
 
 # Advertisement age
-estate_age => :"Bez omezeni", 2:"Den", 8:"Poslednich 7 dni", 31:"Poslednich 30 dni"
+estate_age => 1 :"Bez omezeni", 2:"Den", 8:"Poslednich 7 dni", 31:"Poslednich 30 dni"
 
 # Country
 locality_country_id => 10001:"Vse", 112:"Ceska republika"

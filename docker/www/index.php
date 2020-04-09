@@ -74,18 +74,12 @@
     foreach ($rows as $row) {
       $count += 1;
       $row = json_decode(json_encode($row), true);
-      $date = date('Y-m-d', strtotime($row['parsed']['date'])); 
-      if($row['items'] != '') {
-        foreach($row['items'] as $i) {
-          if($i['name'] == 'Užitná plocha') {
-            $prices_by_date[$date][] = round($row['price_czk']['value_raw']/$i['value'], 0);
-          }
-        }
+      foreach($row['parsed']['price'] as $parsed_date => $total_price) {
+        $prices_by_date[ date('Y-m-d', strtotime($parsed_date)) ][] = $total_price/$row['parsed']['space_m2'];
       }
     }
-
     foreach($prices_by_date as $key => $value) {
-      $prices_by_date[$key] = array_sum($value)/count($value);
+      $prices_by_date[$key] = round( array_sum($value)/count($value), 2);
     }
     ksort($prices_by_date);
 
@@ -94,6 +88,7 @@
 
     echo('<center>TOTAL NUMBER OF RECORDS IS ') . $count . '</center><br>';
     DateTimeOptionsPick(key($prices_by_date), end(array_keys($prices_by_date)), $params);
+    // pp($prices_by_date);
     GraphFromArray($prices_by_date, $FilterStartDate, $FilterEndDate);
 
   echo '</div>'

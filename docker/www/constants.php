@@ -46,14 +46,4 @@ $locality_region_id = array(1 => "Jihocesky", 14 => "Jihomoravsky", 3 => "Karlov
 # Prague districts
 $locality_district_id = array(56 => "Praha-vychod", 57 => "Praha-zapad", 5001 => "Praha 1", 5002 => "Praha 2", 5003 => "Praha 3", 5004 => "Praha 4", 5005 => "Praha 5", 5006 => "Praha 6", 5007 => "Praha 7", 5008 => "Praha 8", 5009 => "Praha 9", 5010 => "Praha 10");
 
-// $filter = [ "seo.category_sub_cb" => 2 ];
-// $filter = [ "codeItems.something_more1" => 2 ];
-// $filter = [ "codeItems.something_more2" => 2 ];
-// $filter = [ "codeItems.something_more3" => 2 ];
-// $filter = [ "codeItems.building_type_search" => 2 ];
-// $filter = [ "codeItems.ownership" => 2 ];
-// $filter = [ "items.name" => 'Stav objektu', "items.value" => 'Velmi dobrý'];
-// $filter = [ "items.name" => 'Vybavení', "items.value" => 'Částečně'];
-// $filter = [ "locality_district_id" => 5001];
-
 ?>

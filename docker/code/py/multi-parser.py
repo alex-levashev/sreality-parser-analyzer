@@ -14,9 +14,12 @@ request = [
 'category_type_cb=1',
 'category_main_cb=1',
 'ownership=1',
-'czk_price_summary_order2=4990000-5000000',
-'estate_age=1',
-'locality_district_id=5001,5002,5003,5004,5005,5006,5007,5008,5009,5010'
+'czk_price_summary_order2=1000000-20000000',
+# 'czk_price_summary_order2=1000000-2900000',
+# 'estate_age=1',
+'estate_age=0',
+'locality_district_id=56,57,5001,5002,5003,5004,5005,5006,5007,5008,5009,5010'
+# 'locality_district_id=5010'
 ]
 
 per_page = 999
@@ -31,30 +34,37 @@ def get_item_data_by_id ( id ):
     url = "https://www.sreality.cz/api/cs/v2/estates/" + str(id)
     response = urllib.urlopen(url)
     data = json.loads(response.read())
-    for item in data['items']:
-        if(item['name'] == 'Aktualizace' and item['value'] == 'Dnes'):
-            item['value'] = datetime.today().strftime("%d.%m.%Y")
-        elif(item['name'] == 'Aktualizace' and  item['value'].encode('utf-8') == 'Včera'):
-            item['value'] = (datetime.today() - timedelta(days=1)).strftime("%d.%m.%Y")
-    data['parsed'] = { 'date': datetime.today().strftime("%d.%m.%Y"), 'id': id, 'price': { datetime.today().strftime("%d-%m-%Y") : data['price_czk']['value_raw'] } }
-    data.pop('poi', None)
-    data['_embedded'].pop('images', None)
-    if('seller' in data['_embedded'] and 'user_id' in data['_embedded']['seller']):
-        if(data['_embedded']['seller']['user_id'] != ''):
-            tmp = data['_embedded']['seller']['user_id']
-            data['_embedded']['seller'].clear()
-            data['_embedded']['seller']['user_id'] = tmp;
+    if 'items' in data:
+        for item in data['items']:
+            if(item['name'].encode('utf-8') == 'Užitná plocha'):
+                space_m2 = item['value']
+            if(item['name'] == 'Aktualizace' and item['value'] == 'Dnes'):
+                item['value'] = datetime.today().strftime("%d.%m.%Y")
+            elif(item['name'] == 'Aktualizace' and  item['value'].encode('utf-8') == 'Včera'):
+                item['value'] = (datetime.today() - timedelta(days=1)).strftime("%d.%m.%Y")
+
+        data['parsed'] = { 'date': datetime.today().strftime("%d.%m.%Y"), 'id': id, 'price': { datetime.today().strftime("%d-%m-%Y") : data['price_czk']['value_raw'] }, 'space_m2': space_m2 }
+        data.pop('poi', None)
+        data['_embedded'].pop('images', None)
+        if('seller' in data['_embedded'] and 'user_id' in data['_embedded']['seller']):
+            if(data['_embedded']['seller']['user_id'] != ''):
+                tmp = data['_embedded']['seller']['user_id']
+                data['_embedded']['seller'].clear()
+                data['_embedded']['seller']['user_id'] = tmp;
+        else:
+            data['_embedded']['seller'] = {'user_id':'NA'}
     else:
-        data['_embedded']['seller'] = {'user_id':'NA'}
+        data = 'Bad Data'
     return(data)
 
 def record_item_to_db ( item_id ):
     item_from_request = get_item_data_by_id(item_id['hash_id'])
-    item_from_db = col.find_one({"parsed.id":item_from_request['parsed']['id']})
-    if(item_from_db is None):
-        col.insert_one(item_from_request)
-    elif(item_from_db is not None and item_from_request['price_czk']['value_raw'] != item_from_db['price_czk']['value_raw']):
-        col.update_one({"parsed.id":item_from_request['parsed']['id']}, { "$set": { "price_czk.value_raw" : item_from_request['price_czk']['value_raw'], "parsed.price." + str(datetime.today().strftime("%d-%m-%Y")): item_from_db['price_czk']['value_raw']  }  })
+    if(item_from_request != 'Bad Data'):
+        item_from_db = col.find_one({"parsed.id":item_from_request['parsed']['id']})
+        if(item_from_db is None):
+            col.insert_one(item_from_request)
+        else:
+            col.update_one({"parsed.id":item_from_request['parsed']['id']}, { "$set": { "price_czk.value_raw" : item_from_request['price_czk']['value_raw'], "parsed.price." + str(datetime.today().strftime("%d-%m-%Y")): item_from_request['price_czk']['value_raw']  }  })
     return
 
 
@@ -69,26 +79,28 @@ col = db["raw_requests"]
 total_number = get_list_of_items_by_request(request, 1, 1)['result_size']
 print('Totally ' + str(total_number) + ' items found.')
 
-total_number_of_pages = total_number/per_page
+total_number_of_pages = total_number/per_page + 1
+print(str(total_number_of_pages-1) + ' full page(s), each page has ' + str(per_page) + ' items plus one last page has ' + str(total_number-(per_page*(total_number_of_pages-1))))
+# pool = ThreadPool(10)
+
 if(total_number == 0):
     print('Exiting ... Nothing to store')
-    print('Script ends at ' + end_time.strftime("%Y-%m-%d %H:%M:%S") + ' run for ' + str((end_time-start_time).total_seconds()) + ' seconds.')
     sys.exit()
-
-pool = ThreadPool(20)
-
-if(total_number_of_pages <= 0):
+elif(total_number_of_pages == 1):
     houses = get_list_of_items_by_request(request, per_page, 1)['_embedded']['estates']
-    results = pool.map(record_item_to_db, houses)
-    pool.close()
-    pool.join()
-
+    for house in houses:
+        record_item_to_db(house)
+    # results = pool.map(record_item_to_db, houses)
+    # pool.close()
+    # pool.join()
 else:
-    while(total_number_of_pages >= 0):
-        houses = get_list_of_items_by_request(request, per_page, total_number_of_pages+1)['_embedded']['estates']
-        results = pool.map(record_item_to_db, houses)
-        pool.close()
-        pool.join()
+    while(total_number_of_pages >= 1):
+        houses = get_list_of_items_by_request(request, per_page, total_number_of_pages)['_embedded']['estates']
+        for house in houses:
+            record_item_to_db(house)
+        # results = pool.map(record_item_to_db, houses)
+        # pool.close()
+        # pool.join()
         total_number_of_pages -= 1
 
 print('Totally ' + str(total_number) + ' items found.')
